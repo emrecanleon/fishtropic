@@ -94,6 +94,7 @@
 
       /* ===== HUD: HAYALET CAM BUTONLAR (pro oyun stili) ===== */
       .hud-btn {
+        box-sizing: border-box;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -126,8 +127,6 @@
           color 0.3s,
           border-color 0.3s;
         white-space: nowrap;
-        overflow: hidden; /* taşmayı gizle */
-        text-overflow: ellipsis; /* çok uzun metinde ... göster */
         text-shadow:
           0 2px 4px rgba(255, 255, 255, 0.85),
           0 0 1px rgba(255, 255, 255, 0.9); /* güçlü açık gölge */
@@ -135,10 +134,7 @@
 
       /* Buton içindeki metin taşmasın */
       .hud-btn > span {
-        overflow: hidden;
-        text-overflow: ellipsis;
         white-space: nowrap;
-        min-width: 0; /* flex child'ın küçülebilmesi için gerekli */
       }
       .hud-btn:active {
         transform: scale(0.96);
