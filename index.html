@@ -6,6 +6,19 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
     />
+    <script>
+      (function () {
+        if (/Android/i.test(navigator.userAgent)) {
+          var vp = document.querySelector('meta[name="viewport"]');
+          if (vp) {
+            vp.setAttribute(
+              "content",
+              "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+            );
+          }
+        }
+      })();
+    </script>
     <title>FishTropic</title>
     <meta name="theme-color" content="#0a1a2e" />
     <meta name="description" content="FishTropic" />
@@ -86,9 +99,9 @@
         justify-content: center;
         gap: 6px;
         min-height: 40px;
-        width: 150px; /* sabit genişlik — içerik uzasa da büyümez */
-        min-width: 150px;
-        max-width: 150px;
+        width: 180px;
+        min-width: 180px;
+        max-width: 180px;
         padding: 8px 10px;
         background: rgba(255, 255, 255, 0.18); /* çok şeffaf */
         color: #1a3a4a;
@@ -219,9 +232,9 @@
         background: linear-gradient(180deg, #fff8e7, #ffe9c4);
         border-radius: 12px;
         padding: 5px 0;
-        width: 150px;
-        min-width: 150px;
-        max-width: 150px;
+        width: 180px;
+        min-width: 180px;
+        max-width: 180px;
         box-sizing: border-box;
         box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
         z-index: 1000;
@@ -281,9 +294,9 @@
         vertical-align: middle;
       }
       html.no-flex-gap #langMenu {
-        width: 150px !important;
-        min-width: 150px !important;
-        max-width: 150px !important;
+        width: 180px !important;
+        min-width: 180px !important;
+        max-width: 180px !important;
         padding: 5px 0 !important;
       }
       html.no-flex-gap[dir="rtl"] .lang-item {
@@ -502,9 +515,9 @@
           top: calc(100% + 4px) !important;
           right: 0;
           left: auto;
-          width: 150px !important;
-          min-width: 150px !important;
-          max-width: 150px !important;
+          width: 180px !important;
+          min-width: 180px !important;
+          max-width: 180px !important;
           box-sizing: border-box;
           max-height: calc(100vh - 58px) !important;
           overflow-y: auto !important;
@@ -571,9 +584,9 @@
       @media (orientation: landscape) and (max-height: 400px) {
         #langMenu,
         html.no-flex-gap #langMenu {
-          width: 130px !important;
-          min-width: 130px !important;
-          max-width: 130px !important;
+          width: 180px !important;
+          min-width: 180px !important;
+          max-width: 180px !important;
         }
       }
     </style>
