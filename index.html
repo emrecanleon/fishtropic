@@ -280,6 +280,23 @@
         min-height: 42px;
       }
 
+      /* ===== ESKİ CİHAZ: SAYAÇ ve DİL BUTONU BOŞLUK DÜZELTMESİ ===== */
+      /* gap desteklenmediği için ikon/svg ile yazı bitişik kalıyordu */
+      html.no-flex-gap #counter svg {
+        margin-right: 6px;
+      }
+      html.no-flex-gap #langBtn svg {
+        margin-right: 6px;
+      }
+      html.no-flex-gap[dir="rtl"] #counter svg {
+        margin-right: 0;
+        margin-left: 6px;
+      }
+      html.no-flex-gap[dir="rtl"] #langBtn svg {
+        margin-right: 0;
+        margin-left: 6px;
+      }
+
       /* ===== ESKİ CİHAZ DÜZELTMESİ (no-flex-gap) ===== */
       html.no-flex-gap .lang-item {
         gap: 0 !important;
