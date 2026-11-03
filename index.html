@@ -280,21 +280,16 @@
         min-height: 42px;
       }
 
-      /* ===== ESKİ CİHAZ: SAYAÇ ve DİL BUTONU BOŞLUK DÜZELTMESİ ===== */
-      /* gap desteklenmediği için ikon/svg ile yazı bitişik kalıyordu */
-      html.no-flex-gap #counter svg {
-        margin-right: 6px;
-      }
-      html.no-flex-gap #langBtn svg {
-        margin-right: 6px;
-      }
-      html.no-flex-gap[dir="rtl"] #counter svg {
-        margin-right: 0;
+      /* ===== ESKİ CİHAZ: HUD BUTONU BOŞLUK DÜZELTMESİ ===== */
+      /* gap desteklenmediği için ikon/svg ile yazı bitişik kalıyordu.
+         Bu kural tüm .hud-btn butonları için geçerli (sayaç, dil, ses, hakkında, vs.)
+         ve gap: 6px'in birebir karşılığıdır. */
+      html.no-flex-gap .hud-btn > * + * {
         margin-left: 6px;
       }
-      html.no-flex-gap[dir="rtl"] #langBtn svg {
-        margin-right: 0;
-        margin-left: 6px;
+      html.no-flex-gap[dir="rtl"] .hud-btn > * + * {
+        margin-left: 0;
+        margin-right: 6px;
       }
 
       /* ===== ESKİ CİHAZ DÜZELTMESİ (no-flex-gap) ===== */
@@ -2303,7 +2298,13 @@
         function computeLayout() {
           // Gökyüzü EN TEPEDEN başlar → HUD cam efektli olduğu için arkasındaki gökyüzü görünür.
           skyTop = 0;
-          skyH = H * SKY_RATIO; // ekran yüksekliğinin ~%30'u gökyüzü
+
+          // iPad (4:3) gibi geniş ekranlarda gökyüzünü biraz daha yüksek yap;
+          // böylece güneş/ay ve palmiyeler daha dengeli görünür.
+          var aspect = W / H;
+          var skyRatio = aspect > 1.3 ? 0.36 : SKY_RATIO;
+
+          skyH = H * skyRatio; // gökyüzü yüksekliği
           horizonY = skyTop + skyH; // ufuk çizgisi
           seaH = H - horizonY; // kalan tüm alan deniz
           seabedY = H - seaH * SAND_RATIO; // deniz dibi (kum başlangıcı)
@@ -2630,7 +2631,7 @@
         function drawSun() {
           var a = 1 - nightTransition;
           if (a < 0.01) return;
-          var r = Math.max(11, Math.min(W * 0.05, skyH * 0.12));
+          var r = Math.max(10, skyH * 0.14);
           var sx = W / 2;
           var sy = skyTop + skyH * 0.42 + nightTransition * skyH * 0.25;
           ctx.save();
@@ -2662,7 +2663,7 @@
         function drawMoon() {
           var a = nightTransition;
           if (a < 0.01) return;
-          var r = Math.max(10, Math.min(W * 0.045, skyH * 0.105));
+          var r = Math.max(9, skyH * 0.13);
           var mx = W / 2;
           var my = skyTop + skyH * 0.42 + (1 - nightTransition) * skyH * 0.25;
           ctx.save();
@@ -4102,13 +4103,34 @@
 
         // ----- Olay dinleyicileri -----
         function bindEvents() {
-          // Canvas: touch + mouse uyumlu, mobilde scroll engelle
-          canvas.addEventListener("pointerdown", function (e) {
-            e.preventDefault();
-            closeLangMenu();
-            if (anyPanelOpen()) return;
-            handlePrimaryAction(e.clientX, e.clientY);
-          });
+          // Canvas: Pointer Events varsa onu kullan, yoksa touch/mouse fallback
+          // (iPad Mini 2 gibi eski iOS cihazlarda pointerdown yok)
+          if (window.PointerEvent) {
+            canvas.addEventListener("pointerdown", function (e) {
+              e.preventDefault();
+              closeLangMenu();
+              if (anyPanelOpen()) return;
+              handlePrimaryAction(e.clientX, e.clientY);
+            });
+          } else {
+            canvas.addEventListener(
+              "touchstart",
+              function (e) {
+                e.preventDefault();
+                closeLangMenu();
+                if (anyPanelOpen()) return;
+                var t = e.changedTouches && e.changedTouches[0];
+                if (t) handlePrimaryAction(t.clientX, t.clientY);
+              },
+              { passive: false },
+            );
+            canvas.addEventListener("mousedown", function (e) {
+              e.preventDefault();
+              closeLangMenu();
+              if (anyPanelOpen()) return;
+              handlePrimaryAction(e.clientX, e.clientY);
+            });
+          }
 
           // Klavye: Space / Enter = olta at veya yakala, Escape = paneller
           window.addEventListener("keydown", function (e) {
