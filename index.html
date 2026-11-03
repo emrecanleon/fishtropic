@@ -2424,7 +2424,13 @@
               spot: "#d9e6ee",
             });
           }
+          // Vatozun ekran oranı bozuk cihazlarda aşırı geniş/yassı görünmesini önle
           var rayW = fishBaseScale() * 1.6 * 99;
+          var aspectLimit = W / H;
+          if (aspectLimit < 1.4) {
+            // Yatayda daralan ekranlarda vatozu ekran genişliğine göre sınırla
+            rayW = Math.min(rayW, W * 0.15);
+          }
           for (i = 0; i < rayList.length; i++) rayList[i].w = rayW;
 
           // Su parıltıları
@@ -2642,7 +2648,8 @@
         function drawSun() {
           var a = 1 - nightTransition;
           if (a < 0.01) return;
-          var r = Math.max(10, skyH * 0.14);
+          // Güneşin ekran oranı bozuk cihazlarda (yatay iPad Mini) yassılaşmasını önle
+          var r = Math.max(10, Math.min(skyH * 0.14, Math.min(W, H) * 0.11));
           var sx = W / 2;
           var sy = skyTop + skyH * 0.42 + nightTransition * skyH * 0.25;
           ctx.save();
@@ -2674,7 +2681,8 @@
         function drawMoon() {
           var a = nightTransition;
           if (a < 0.01) return;
-          var r = Math.max(9, skyH * 0.13);
+          // Ayın ekran oranı bozuk cihazlarda yassılaşmasını önle
+          var r = Math.max(9, Math.min(skyH * 0.13, Math.min(W, H) * 0.10));
           var mx = W / 2;
           var my = skyTop + skyH * 0.42 + (1 - nightTransition) * skyH * 0.25;
           ctx.save();
