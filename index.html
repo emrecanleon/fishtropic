@@ -198,9 +198,8 @@
           0 1px #0a1a2e;
       }
       #counter svg {
-        width: auto;
+        width: 28px;
         height: 20px;
-        aspect-ratio: 24 / 16;
         display: block;
         flex-shrink: 0;
       }
@@ -210,7 +209,6 @@
         font-weight: 800;
         line-height: 1;
         display: block;
-        flex-shrink: 0;
         text-shadow:
           -1px 0 #1a3a4a,
           1px 0 #1a3a4a,
@@ -516,13 +514,11 @@
           max-width: 150px;
         }
         #counter svg {
-          width: auto;
-          height: 24px;
-          aspect-ratio: 24 / 16;
+          width: 22px;
+          height: 16px;
         }
         #counter span {
-          font-size: 20px;
-          font-weight: 800;
+          font-size: 15px;
         }
         .hud-btn svg {
           width: 18px;
@@ -573,14 +569,13 @@
           min-width: 90px;
         }
         #counter svg {
-          width: auto;
-          height: 18px;
-          aspect-ratio: 24 / 16;
+          width: 22px;
+          height: 15px;
         }
         #counter span {
-          font-size: 16px;
-          font-weight: 800;
+          font-size: 15px;
         }
+
         /* --- Dil menüsü: konum + genişlik + taşma koruması --- */
         #langMenu {
           top: calc(100% + 4px) !important;
@@ -700,7 +695,7 @@
     <div class="hud" id="hudLeft">
       <div class="hud-btn" id="counter">
         <!-- Siyah balık ikonu -->
-        <svg viewBox="0 0 24 16" width="28" height="20" preserveAspectRatio="xMidYMid meet">
+        <svg viewBox="0 0 24 16">
           <path
             d="M0 8 Q8 0 17 8 Q8 16 0 8 Z M17 8 L23 3 L23 13 Z"
             fill="#2a5a7a"
@@ -2321,19 +2316,7 @@
           // iPad (4:3) gibi geniş ekranlarda gökyüzünü biraz daha yüksek yap;
           // böylece güneş/ay ve palmiyeler daha dengeli görünür.
           var aspect = W / H;
-          var shortSide = Math.min(W, H);
-
-          // Mobil telefon tespiti: kısa kenar < 600px
-          var isPhone = shortSide < 600;
-
-          var skyRatio;
-          if (isPhone) {
-            // Telefon dikey: gökyüzü daha yüksek; yatay: daha alçak
-            skyRatio = aspect < 1.0 ? 0.38 : 0.28;
-          } else {
-            // Masaüstü / tablet: eski davranış (değişmedi)
-            skyRatio = aspect > 1.3 ? 0.36 : SKY_RATIO;
-          }
+          var skyRatio = aspect > 1.3 ? 0.36 : SKY_RATIO;
 
           skyH = H * skyRatio; // gökyüzü yüksekliği
           horizonY = skyTop + skyH; // ufuk çizgisi
@@ -2446,30 +2429,18 @@
           }
           // Vatozun ekran oranı bozuk cihazlarda aşırı geniş/yassı görünmesini önle
           var rayW = fishBaseScale() * 1.6 * 99;
-          var shortSide = Math.min(W, H);
-          var longSide = Math.max(W, H);
-
-          if (shortSide < 600) {
-            // Telefon: uzun kenara göre sınırla → yatayda da vatoz büyür
-            rayW = Math.min(rayW, longSide * 0.22);
-            rayW = Math.max(rayW, longSide * 0.10);
-          } else {
-            // Masaüstü / tablet: eski davranış (değişmedi)
-            var aspectLimit = W / H;
-            if (aspectLimit < 1.4) {
-              rayW = Math.min(rayW, W * 0.15);
-            }
+          var aspectLimit = W / H;
+          if (aspectLimit < 1.4) {
+            rayW = Math.min(rayW, W * 0.15);
           }
-
-          // === YENİ: Vatozu kum şeridine sığdır ===
-          // Kum şeridinin görünür yüksekliği
-          var sandVisibleH = Math.max(6, seaH * SAND_RATIO - 4);
-          // Vatozun ekrandaki toplam yüksekliği: rayW * 0.278
-          // Kum şeridinin %80'ini geçmesin
-          var maxRayW = (sandVisibleH * 0.8) / 0.278;
-          rayW = Math.min(rayW, maxRayW);
-          // === /YENİ ===
-
+          // Sadece küçük ekranlarda (mobil) vatoza alt sınır koy — tablet/masaüstünde etkisiz.
+          // Tablet/masaüstünde rayW zaten ~206px, W*0.10 çok daha küçük → Math.max devreye girmez.
+          if (Math.min(W, H) < 600) {
+            rayW = Math.max(rayW, W * 0.10);
+          }
+            // Yatayda daralan ekranlarda vatozu ekran genişliğine göre sınırla
+            rayW = Math.min(rayW, W * 0.15);
+          }
           for (i = 0; i < rayList.length; i++) rayList[i].w = rayW;
 
           // Su parıltıları
@@ -2832,27 +2803,12 @@
           var wv = Math.sin(frameCount * 0.07 + r.phase); // kanat dalgası
           var s = 1 + 0.12 * wv;
           var px = r.nx * W;
+          var py =
+            seabedY -
+            6 +
+            r.w * 0.14 +
+            Math.sin(frameCount * 0.02 + r.phase) * 1.5;
 
-          // Vatozun EKRANDAKİ yarım yüksekliği (ctx.scale(..., 0.4) hesaba katılıyor)
-          var rayHalfH = u * 0.62 * 1.12 * 0.4; // ≈ u * 0.278
-
-          // Kum şeridinin ekrandaki sınırları
-          var sandTopY = seabedY - 10;              // kum canvas'ının üst kenarı
-          var sandH = Math.max(10, seaH * SAND_RATIO + 10);
-          var sandBottomY = sandTopY + sandH;       // kum canvas'ının alt kenarı
-          // Kumun görsel üst çizgisi (dalgalı kenarın ortalaması ~ seabedY)
-          var sandVisualTopY = seabedY + 2;
-
-          // Vatozun merkezini kum şeridinin tam ortasına yerleştir,
-          // ama alt/üst kenarları kumun dışına taşmasın
-          var sandCenterY = (sandVisualTopY + sandBottomY) / 2;
-          var minCenterY = sandVisualTopY + rayHalfH + 2;   // üstten taşmasın
-          var maxCenterY = sandBottomY - rayHalfH - 2;      // alttan taşmasın
-          var py = Math.max(minCenterY, Math.min(maxCenterY, sandCenterY));
-
-          // Hafif süzülme (kum sınırları içinde kalacak şekilde sınırla)
-          py += Math.sin(frameCount * 0.02 + r.phase) * 1.5;
-          py = Math.max(minCenterY, Math.min(maxCenterY, py));
           ctx.save();
           ctx.translate(px, py);
           ctx.scale(r.dir, 0.4); // yönü çevir, yukarıdan perspektif için yassılt
@@ -3611,16 +3567,18 @@
         // BALIK DAVRANIŞI (yakalandıktan sonra denizde yüzme)
         // =====================================================
         function fishBaseScale() {
-          var shortSide = Math.min(W, H);
-          if (shortSide < 600) {
-            // Telefon: uzun kenarı referans al → yatayda da balıklar büyür
-            var longSide = Math.max(W, H);
-            // Dikey: shortSide/420 ≈ 0.93; Yatay: longSide/700 ≈ 1.2
-            var ref = (W < H) ? shortSide / 420 : longSide / 700;
-            return Math.max(0.7, Math.min(1.6, ref));
+          var base = Math.max(0.5, Math.min(1.3, seaH / 420));
+          // Sadece "küçük ekran" durumunda (base < 1.3) mobilde büyüt.
+          // Tablet/masaüstünde base zaten 1.3 → hiç değişmez.
+          if (base < 1.3) {
+            var shortSide = Math.min(W, H);
+            var mobileBoost = Math.max(1.0, Math.min(1.6, 480 / shortSide));
+            base = Math.min(1.3, base * mobileBoost);
           }
-          // Masaüstü / tablet: eski davranış (değişmedi)
-          return Math.max(0.5, Math.min(1.3, seaH / 420));
+          return base;
+        }
+        function fishScale(id) {
+          return fishBaseScale() * FISH_DATA[id].size;
         }
 
         // Boyuta göre derinlik sınırları (büyük balıklar su üstüne çıkmaz)
