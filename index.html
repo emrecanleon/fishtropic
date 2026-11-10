@@ -2460,6 +2460,16 @@
               rayW = Math.min(rayW, W * 0.15);
             }
           }
+
+          // === YENİ: Vatozu kum şeridine sığdır ===
+          // Kum şeridinin görünür yüksekliği
+          var sandVisibleH = Math.max(6, seaH * SAND_RATIO - 4);
+          // Vatozun ekrandaki toplam yüksekliği: rayW * 0.278
+          // Kum şeridinin %80'ini geçmesin
+          var maxRayW = (sandVisibleH * 0.8) / 0.278;
+          rayW = Math.min(rayW, maxRayW);
+          // === /YENİ ===
+
           for (i = 0; i < rayList.length; i++) rayList[i].w = rayW;
 
           // Su parıltıları
@@ -2822,12 +2832,27 @@
           var wv = Math.sin(frameCount * 0.07 + r.phase); // kanat dalgası
           var s = 1 + 0.12 * wv;
           var px = r.nx * W;
-          var py =
-            seabedY -
-            6 +
-            r.w * 0.14 +
-            Math.sin(frameCount * 0.02 + r.phase) * 1.5;
 
+          // Vatozun EKRANDAKİ yarım yüksekliği (ctx.scale(..., 0.4) hesaba katılıyor)
+          var rayHalfH = u * 0.62 * 1.12 * 0.4; // ≈ u * 0.278
+
+          // Kum şeridinin ekrandaki sınırları
+          var sandTopY = seabedY - 10;              // kum canvas'ının üst kenarı
+          var sandH = Math.max(10, seaH * SAND_RATIO + 10);
+          var sandBottomY = sandTopY + sandH;       // kum canvas'ının alt kenarı
+          // Kumun görsel üst çizgisi (dalgalı kenarın ortalaması ~ seabedY)
+          var sandVisualTopY = seabedY + 2;
+
+          // Vatozun merkezini kum şeridinin tam ortasına yerleştir,
+          // ama alt/üst kenarları kumun dışına taşmasın
+          var sandCenterY = (sandVisualTopY + sandBottomY) / 2;
+          var minCenterY = sandVisualTopY + rayHalfH + 2;   // üstten taşmasın
+          var maxCenterY = sandBottomY - rayHalfH - 2;      // alttan taşmasın
+          var py = Math.max(minCenterY, Math.min(maxCenterY, sandCenterY));
+
+          // Hafif süzülme (kum sınırları içinde kalacak şekilde sınırla)
+          py += Math.sin(frameCount * 0.02 + r.phase) * 1.5;
+          py = Math.max(minCenterY, Math.min(maxCenterY, py));
           ctx.save();
           ctx.translate(px, py);
           ctx.scale(r.dir, 0.4); // yönü çevir, yukarıdan perspektif için yassılt
