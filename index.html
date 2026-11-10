@@ -2438,9 +2438,6 @@
           if (Math.min(W, H) < 600) {
             rayW = Math.max(rayW, W * 0.10);
           }
-            // Yatayda daralan ekranlarda vatozu ekran genişliğine göre sınırla
-            rayW = Math.min(rayW, W * 0.15);
-          }
           for (i = 0; i < rayList.length; i++) rayList[i].w = rayW;
 
           // Su parıltıları
