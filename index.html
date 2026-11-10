@@ -2436,8 +2436,7 @@
           // Sadece küçük ekranlarda (mobil) vatoza alt sınır koy — tablet/masaüstünde etkisiz.
           // Tablet/masaüstünde rayW zaten ~206px, W*0.10 çok daha küçük → Math.max devreye girmez.
           if (Math.min(W, H) < 600) {
-                        rayW = Math.max(rayW, Math.min(W, H) * 0.32, W * 0.10);
-
+            rayW = Math.max(rayW, Math.min(W, H) * 0.32, W * 0.10);
           }
           for (i = 0; i < rayList.length; i++) rayList[i].w = rayW;
 
@@ -2636,6 +2635,8 @@
           computeLayout();
           buildStaticCaches();
           initWorldObjects();
+          // Ekran döndürme / yeniden boyutlandırmada balıkları yeni sınırlara oturt
+          if (typeof restoreSwimmers === "function") restoreSwimmers();
         }
 
         // ----- Gökyüzü öğeleri -----
