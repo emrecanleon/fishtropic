@@ -198,8 +198,9 @@
           0 1px #0a1a2e;
       }
       #counter svg {
-        width: 28px;
+        width: auto;
         height: 20px;
+        aspect-ratio: 24 / 16;
         display: block;
         flex-shrink: 0;
       }
@@ -209,6 +210,7 @@
         font-weight: 800;
         line-height: 1;
         display: block;
+        flex-shrink: 0;
         text-shadow:
           -1px 0 #1a3a4a,
           1px 0 #1a3a4a,
@@ -514,11 +516,13 @@
           max-width: 150px;
         }
         #counter svg {
-          width: 30px;
-          height: 21px;
+          width: auto;
+          height: 24px;
+          aspect-ratio: 24 / 16;
         }
         #counter span {
           font-size: 20px;
+          font-weight: 800;
         }
         .hud-btn svg {
           width: 18px;
@@ -569,13 +573,14 @@
           min-width: 90px;
         }
         #counter svg {
-          width: 24px;
-          height: 17px;
+          width: auto;
+          height: 18px;
+          aspect-ratio: 24 / 16;
         }
         #counter span {
           font-size: 16px;
+          font-weight: 800;
         }
-
         /* --- Dil menüsü: konum + genişlik + taşma koruması --- */
         #langMenu {
           top: calc(100% + 4px) !important;
@@ -695,7 +700,7 @@
     <div class="hud" id="hudLeft">
       <div class="hud-btn" id="counter">
         <!-- Siyah balık ikonu -->
-        <svg viewBox="0 0 24 16">
+        <svg viewBox="0 0 24 16" width="28" height="20" preserveAspectRatio="xMidYMid meet">
           <path
             d="M0 8 Q8 0 17 8 Q8 16 0 8 Z M17 8 L23 3 L23 13 Z"
             fill="#2a5a7a"
@@ -2440,7 +2445,7 @@
             });
           }
           // Vatozun ekran oranı bozuk cihazlarda aşırı geniş/yassı görünmesini önle
-          var rayW = fishBaseScale() * 1.8 * 99;
+          var rayW = fishBaseScale() * 1.7 * 99;
           var shortSide = Math.min(W, H);
           var longSide = Math.max(W, H);
 
