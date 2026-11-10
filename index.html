@@ -2316,7 +2316,19 @@
           // iPad (4:3) gibi geniş ekranlarda gökyüzünü biraz daha yüksek yap;
           // böylece güneş/ay ve palmiyeler daha dengeli görünür.
           var aspect = W / H;
-          var skyRatio = aspect > 1.3 ? 0.36 : SKY_RATIO;
+          var shortSide = Math.min(W, H);
+
+          // Mobil telefon tespiti: kısa kenar < 600px
+          var isPhone = shortSide < 600;
+
+          var skyRatio;
+          if (isPhone) {
+            // Telefon dikey: gökyüzü daha yüksek; yatay: daha alçak
+            skyRatio = aspect < 1.0 ? 0.38 : 0.28;
+          } else {
+            // Masaüstü / tablet: eski davranış (değişmedi)
+            skyRatio = aspect > 1.3 ? 0.36 : SKY_RATIO;
+          }
 
           skyH = H * skyRatio; // gökyüzü yüksekliği
           horizonY = skyTop + skyH; // ufuk çizgisi
@@ -2429,10 +2441,18 @@
           }
           // Vatozun ekran oranı bozuk cihazlarda aşırı geniş/yassı görünmesini önle
           var rayW = fishBaseScale() * 1.6 * 99;
-          var aspectLimit = W / H;
-          if (aspectLimit < 1.4) {
-            // Yatayda daralan ekranlarda vatozu ekran genişliğine göre sınırla
-            rayW = Math.min(rayW, W * 0.15);
+          var shortSide = Math.min(W, H);
+
+          if (shortSide < 600) {
+            // Telefon: kısa kenara göre sınırla (dikey/yatay tutarlı)
+            rayW = Math.min(rayW, shortSide * 0.28);
+            rayW = Math.max(rayW, shortSide * 0.12);
+          } else {
+            // Masaüstü / tablet: eski davranış (değişmedi)
+            var aspectLimit = W / H;
+            if (aspectLimit < 1.4) {
+              rayW = Math.min(rayW, W * 0.15);
+            }
           }
           for (i = 0; i < rayList.length; i++) rayList[i].w = rayW;
 
@@ -3560,6 +3580,12 @@
         // BALIK DAVRANIŞI (yakalandıktan sonra denizde yüzme)
         // =====================================================
         function fishBaseScale() {
+          var shortSide = Math.min(W, H);
+          if (shortSide < 600) {
+            // Telefon: kısa kenara göre ölçekle (dikey/yatay tutarlı)
+            return Math.max(0.7, Math.min(1.6, shortSide / 420));
+          }
+          // Masaüstü / tablet: eski davranış (değişmedi)
           return Math.max(0.5, Math.min(1.3, seaH / 420));
         }
         function fishScale(id) {
